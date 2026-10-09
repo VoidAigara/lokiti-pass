@@ -37,6 +37,10 @@ export async function errorBoundary(ctx: Context, next: NextFunction): Promise<v
     await next();
   } catch (err) {
     // grammY сам логирует ошибки наружного handler'а; здесь — вежливый ответ
+    console.error(
+      "[bot] handler error:",
+      err instanceof Error ? (err.stack ?? err.message) : err
+    );
     const msg =
       err instanceof Error ? err.message : "неизвестная ошибка";
     if (/fetch failed|ECONNREFUSED|aborted/i.test(msg)) {

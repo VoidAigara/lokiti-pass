@@ -19,12 +19,20 @@ export const BTN = {
 /**
  * Кнопки главного меню — обычные текстовые: нажатие отправляет текст в чат,
  * где его подхватывает bot.hears() и открывает сцену в чате.
- * Никаких web_app/ссылок на сайт — работает без HTTPS и без сайта.
+ * Если задан https WEB_URL — добавляется web_app-кнопка: сайт открывается
+ * как Telegram Mini App внутри клиента (initData → автологин на сайте).
  */
+const webAppUrl = botEnv.WEB_URL.startsWith("https://") ? botEnv.WEB_URL : null;
+
 export const mainKeyboard = {
   keyboard: [
     [{ text: BTN.buy }, { text: BTN.renew }],
     [{ text: BTN.profile }, { text: BTN.support }],
+    ...(webAppUrl
+      ? ([[ { text: "🌐 Кабинет на сайте", web_app: { url: webAppUrl } } ]] as [
+          [{ text: string; web_app: { url: string } }]
+        ])
+      : []),
   ],
   resize_keyboard: true,
   is_persistent: true,

@@ -9,6 +9,10 @@ on:
   schedule:
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
+    inputs:
+      limit_ms:
+        description: "CI_BOT_LIMIT_MS — остановить бота через N мс (для смоуков)"
+        required: false
 
 concurrency:
   group: telegram-bot
@@ -49,4 +53,5 @@ jobs:
           INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
           WEB_URL: ${{ secrets.WEB_URL }}
           ALERT_CHAT_ID: ${{ secrets.ALERT_CHAT_ID }}
+          CI_BOT_LIMIT_MS: ${{ inputs.limit_ms }}
         run: pnpm exec tsx scripts/ci-run-bot.ts
