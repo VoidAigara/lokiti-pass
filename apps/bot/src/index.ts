@@ -32,13 +32,22 @@ import {
   broadcastConversation,
 } from "./admin/conversations.js";
 
-const bot = new Bot<BotContext>(botEnv.BOT_TOKEN);
+// client.timeoutSeconds: дефолт grammY — 500с. При недоступном Telegram старт
+// (getMe/deleteWebhook, которые grammY молча ретраит в withRetries) висит по
+// 8+ минут без единой строки лога. 60с: long-poll getUpdates держит 30с,
+// остальные вызовы падают быстро и видны в логах.
+const bot = new Bot<BotContext>(botEnv.BOT_TOKEN, {
+  client: { timeoutSeconds: 60 },
+});
 
 // ---------------------------------------------------------- видимость сети с Telegram
-// grammY молча ретраит сбойный getUpdates каждые 3с (логи только с DEBUG=grammy:*)
-// — из-за этого бот может часами «не работать» без единой строки в логах.
-// Трансформер API логирует первое падение и восстановление.
+// grammY молча ретраит сбойный getUpdates каждые 3с и вечно ретраит стартовые
+// getMe/deleteWebhook в withRetries (логи только с DEBUG=grammy:*) — из-за этого
+// бот может часами «не работать» без единой строки в логах.
+// Трансформер API логирует первое падение и восстановление каждого метода;
+// GrammyError (error_code от Telegram) не считаем обрывом сети — их разрулит вызывающий код.
 let telegramDownSince: number | null = null;
+const setupFailing = new Set<string>();
 bot.api.config.use(async (prev, method, payload) => {
   try {
     const res = await prev(method, payload);
@@ -46,13 +55,26 @@ bot.api.config.use(async (prev, method, payload) => {
       const secs = Math.round((Date.now() - telegramDownSince) / 1000);
       telegramDownSince = null;
       console.log(`[bot] Telegram снова доступен (недоступен был ${secs}с)`);
+    } else if (method !== "getUpdates" && setupFailing.delete(method)) {
+      console.log(`[bot] Telegram API снова отвечает (${method})`);
     }
     return res;
   } catch (err) {
+    const isTransport = !(err instanceof Error && "error_code" in err);
     if (method === "getUpdates" && telegramDownSince === null) {
       telegramDownSince = Date.now();
       console.error(
         "[bot] НЕТ СВЯЗИ С TELEGRAM (getUpdates):",
+        err instanceof Error ? err.message : err
+      );
+    } else if (
+      method !== "getUpdates" &&
+      isTransport &&
+      !setupFailing.has(method)
+    ) {
+      setupFailing.add(method);
+      console.error(
+        `[bot] НЕТ СВЯЗИ С TELEGRAM (${method}):`,
         err instanceof Error ? err.message : err
       );
     }
