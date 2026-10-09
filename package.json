@@ -1,0 +1,42 @@
+{
+  "name": "lokiti-pass",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Проходка на Minecraft-сервер Loki Ti — бот, лендинг, админка",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/*\" build && pnpm -r --filter \"./apps/*\" build",
+    "build:db": "pnpm --filter @loki/db build",
+    "dev:api": "pnpm --filter @loki/api dev",
+    "dev:bot": "pnpm --filter @loki/bot dev",
+    "dev:web": "pnpm --filter @loki/web dev",
+    "dev": "pnpm -r --filter \"./apps/*\" dev",
+    "start:api": "pnpm --filter @loki/api start",
+    "start:bot": "pnpm --filter @loki/bot start",
+    "start:web": "pnpm --filter @loki/web start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r --filter \"./packages/*\" typecheck && pnpm -r --filter \"./apps/*\" typecheck",
+    "db:generate": "pnpm --filter @loki/db generate",
+    "db:migrate": "pnpm --filter @loki/db migrate:dev",
+    "db:deploy": "pnpm --filter @loki/db migrate:deploy",
+    "db:push": "pnpm --filter @loki/db push",
+    "db:studio": "pnpm --filter @loki/db studio",
+    "migrate:donationalerts": "tsx scripts/migrate-donationalerts.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "setup": "pnpm install && pnpm db:generate && pnpm build:db"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^2.1.5"
+  }
+}

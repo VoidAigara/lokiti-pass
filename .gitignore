@@ -1,0 +1,36 @@
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# секреты — никогда в git
+.env
+.env.*
+!.env.example
+!.env.production.example
+*.pem
+*.key
+
+# prisma
+apps/api/prisma/migrations/dev.db*
+*.db
+
+# логи
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ide / os
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# docker volumes
+volumes/
+postgres-data/

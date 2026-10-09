@@ -1,0 +1,13 @@
+# Hotfix image (local-only): rebuild api runtime from the existing local image
+# when the registry (docker.io) is unreachable. The root .dockerignore excludes
+# **/dist, so build from a staged context, NOT the repo root:
+#
+#   $st="$env:TEMP\opencode\hotfix\api"; New-Item -ItemType Directory -Force $st
+#   Copy-Item apps\api\dist "$st\dist" -Recurse
+#   Copy-Item apps\api\Dockerfile.hotfix "$st\Dockerfile"
+#   docker build -t loki-api $st
+#
+# On the VPS with registry access use the normal `docker compose build` instead.
+# CMD не переопределяем: из базового образа остаётся migrate deploy + node.
+FROM loki-api:latest
+COPY dist /app/apps/api/dist

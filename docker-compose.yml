@@ -1,0 +1,165 @@
+name: lokiti-pass
+
+x-app-env: &app-env
+  NODE_ENV: production
+  TZ: Europe/Moscow
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  DATABASE_URL: ${DATABASE_URL:?Задай DATABASE_URL в .env}
+  REDIS_URL: redis://redis:6379
+  # секреты без дефолтов: compose упадёт при пустом .env вместо старта с заглушками
+  INTERNAL_TOKEN: ${INTERNAL_TOKEN:?Задай INTERNAL_TOKEN (32+ символов)}
+  JWT_SECRET: ${JWT_SECRET:?Задай JWT_SECRET (32+ символов)}
+  JWT_TTL: ${JWT_TTL:-7d}
+  BOT_TOKEN: ${BOT_TOKEN:?Задай BOT_TOKEN}
+  ADMIN_TG_IDS: ${ADMIN_TG_IDS:-}
+  ALERT_CHAT_ID: ${ALERT_CHAT_ID:-}
+  YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID:-}
+  YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY:-}
+  YOOKASSA_WEBHOOK_IPS: ${YOOKASSA_WEBHOOK_IPS:-}
+  YOOKASSA_IDEMPOTENCE_KEY: ${YOOKASSA_IDEMPOTENCE_KEY:-}
+  YOOKASSA_RECEIPT: ${YOOKASSA_RECEIPT:-false}
+  YOOKASSA_VAT_CODE: ${YOOKASSA_VAT_CODE:-1}
+  YOOKASSA_TAXATION_SYSTEM: ${YOOKASSA_TAXATION_SYSTEM:-1}
+  # true — доверять вебхуку без проверки в YooKassa (ТОЛЬКО разработка/smoke)
+  DEMO_WEBHOOK_TRUST: ${DEMO_WEBHOOK_TRUST:-false}
+  # доверенные reverse-proxy (IP/CIDR через запятую); пусто = XFF игнорируется
+  TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+  STARS_ENABLED: ${STARS_ENABLED:-true}
+  STARS_RUB_PER_STAR: ${STARS_RUB_PER_STAR:-2}
+  MC_HOST: ${MC_HOST:-minecraft}
+  MC_RCON_PORT: ${MC_RCON_PORT:-25575}
+  MC_RCON_PASSWORD: ${MC_RCON_PASSWORD:-}
+  MC_QUERY_HOST: ${MC_QUERY_HOST:-minecraft}
+  MC_QUERY_PORT: ${MC_QUERY_PORT:-25565}
+  MC_SERVER_IP: ${MC_SERVER_IP:-play.lokiti.ru}
+  RATE_LIMIT_PER_MIN: ${RATE_LIMIT_PER_MIN:-10}
+  # админка по IP: CIDR через запятую; пусто = проверка по IP выключена
+  ADMIN_IP_ALLOWLIST: ${ADMIN_IP_ALLOWLIST:-}
+  # очередь вайтлиста (BullMQ)
+  QUEUE_WHITELIST_CONCURRENCY: ${QUEUE_WHITELIST_CONCURRENCY:-2}
+  QUEUE_ATTEMPTS: ${QUEUE_ATTEMPTS:-5}
+  SENTRY_DSN: ${SENTRY_DSN:-}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: loki
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lokipass-local}
+      POSTGRES_DB: ${POSTGRES_DB:-lokipass}
+    # только localhost: интеграционные тесты ходят с хоста (lokipass_test)
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loki -d ${POSTGRES_DB:-lokipass}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [loki]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [loki]
+
+  api:
+    image: loki-api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      <<: *app-env
+      PORT: 3001
+      API_URL: http://api:3001
+      WEB_URL: ${WEB_URL:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # MC_HOST=host.docker.internal → RCON/игровой сервер на хосте (см. README)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:3001:3001"
+    healthcheck:
+      # /public/season проверяет живость процесса и доступность БД;
+      # /health отдаёт 503 при недоступности RCON и сломал бы healthcheck
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3001/public/season',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks: [loki]
+
+  bot:
+    image: loki-bot
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      <<: *app-env
+      API_URL: http://api:3001
+      WEB_URL: ${WEB_URL:-http://localhost:3000}
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [loki]
+
+  web:
+    image: loki-web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL:-http://localhost:3000}
+        NEXT_PUBLIC_BOT_USERNAME: ${NEXT_PUBLIC_BOT_USERNAME:-}
+        NEXT_PUBLIC_MC_IP: ${NEXT_PUBLIC_MC_IP:-play.lokiti.ru}
+        NEXT_PUBLIC_POSTHOG_KEY: ${NEXT_PUBLIC_POSTHOG_KEY:-}
+        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+        NEXT_PUBLIC_UMAMI_HOST: ${NEXT_PUBLIC_UMAMI_HOST:-}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_TELEMETRY_DISABLED: "1"
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks: [loki]
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  loki:
+    driver: bridge

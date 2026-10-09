@@ -1,0 +1,14 @@
+# Hotfix image (local-only): rebuild web runtime from the existing local image
+# when the registry (docker.io) is unreachable. The root .dockerignore excludes
+# **/.next, so build from a staged context, NOT the repo root:
+#
+#   $st="$env:TEMP\opencode\hotfix\web"; New-Item -ItemType Directory -Force "$st\web"
+#   robocopy apps\web\.next "$st\web\.next" /E /XD cache
+#   robocopy apps\web\public "$st\web\public" /E
+#   Copy-Item apps\web\Dockerfile.hotfix "$st\web\Dockerfile"
+#   docker build -t loki-web "$st\web"
+#
+# On the VPS with registry access use the normal `docker compose build` instead.
+FROM loki-web:latest
+COPY .next /app/apps/web/.next
+COPY public /app/apps/web/public

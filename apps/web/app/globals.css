@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Premium dark-first palette. One accent (pink-red), thin
+   lines, soft shadows. Dark is the default; light is an
+   override via [data-theme="light"] on <html>.
+   ============================================================ */
+:root {
+  color-scheme: dark;
+
+  --c-paper: 10 10 12; /* #0A0A0C */
+  --c-card: 18 18 21; /* #121215 */
+  --c-ink: 243 243 245; /* #F3F3F5 */
+  --c-line: 38 38 44; /* #26262C */
+  --c-soft: 26 26 30; /* #1A1A1E */
+  --c-body: 172 172 181; /* #ACACB5 */
+  --c-faint: 136 136 146;
+  --c-muted: 116 116 126;
+  --c-label: 150 150 160;
+
+  --c-magic: 255 51 102; /* #FF3366 — the only accent */
+  --c-magic-dark: 255 102 145; /* accent text on dark */
+  --c-magic-light: 255 90 135; /* hover */
+
+  --c-ok-text: 46 208 124;
+  --c-bad-text: 255 96 124;
+  --c-warn-text: 255 180 80;
+  --c-ok-dot: 46 208 124;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --c-paper: 233 233 237; /* #E9E9ED — muted grey, not blinding white */
+  --c-card: 244 244 247; /* #F4F4F7 */
+  --c-ink: 10 10 12;
+  --c-line: 212 212 219; /* #D4D4DB */
+  --c-soft: 227 227 232; /* #E3E3E8 */
+  --c-body: 63 63 70;
+  --c-faint: 82 82 91; /* #52525B */
+  --c-muted: 107 107 117; /* #6B6B75 — 4.8:1 on card */
+  --c-label: 90 90 100; /* #5A5A64 */
+
+  --c-magic: 255 51 102;
+  --c-magic-dark: 214 20 90; /* accent text on white (5.1:1) */
+  --c-magic-light: 232 30 100;
+
+  --c-ok-text: 10 122 66;
+  --c-bad-text: 198 16 54;
+  --c-warn-text: 146 90 0;
+  --c-ok-dot: 16 185 129;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: rgb(var(--c-line));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-paper text-body antialiased;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgb(var(--c-magic) / 0.28);
+    color: rgb(var(--c-ink));
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--c-paper));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-line));
+    border: 2px solid rgb(var(--c-paper));
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--c-muted));
+  }
+}
+
+@layer components {
+  /* Surface card: thin line, soft depth */
+  .glass {
+    @apply rounded-2xl border border-line bg-card;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.05),
+      0 24px 48px -32px rgb(0 0 0 / 0.45);
+  }
+
+  .glass-hover {
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .glass-hover:hover {
+    border-color: rgb(var(--c-muted) / 0.55);
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      100deg,
+      rgb(var(--c-magic)) 0%,
+      rgb(var(--c-magic-light)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Primary CTA: single accent fill, near-black label */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-[10px] border border-transparent px-6 py-3 font-display text-sm font-semibold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    background-color: rgb(var(--c-magic));
+    color: #0a0a0c;
+    --tw-ring-color: rgb(var(--c-magic) / 0.55);
+    --tw-ring-offset-color: rgb(var(--c-paper));
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08) saturate(1.05);
+  }
+  .btn-primary:active {
+    filter: brightness(0.94);
+  }
+
+  /* Secondary: quiet outline */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] border border-line bg-transparent px-6 py-3 font-display text-sm font-semibold uppercase tracking-wide text-ink transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    --tw-ring-color: rgb(var(--c-magic) / 0.45);
+    --tw-ring-offset-color: rgb(var(--c-paper));
+  }
+  .btn-ghost:hover {
+    background-color: rgb(var(--c-soft));
+    border-color: rgb(var(--c-muted) / 0.55);
+  }
+
+  /* Eyebrow: small caps accent label with a leading rule */
+  .chip {
+    @apply inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-magic;
+  }
+  .chip::before {
+    content: "";
+    width: 16px;
+    height: 1px;
+    background: rgb(var(--c-magic));
+    flex: none;
+  }
+
+  /* Divider: solid hairline */
+  .hairline {
+    @apply h-px w-full;
+    background: rgb(var(--c-line));
+  }
+}
+
+/* Light theme: eyebrow uses the darker accent for AA contrast on grey */
+[data-theme="light"] .chip {
+  color: rgb(var(--c-magic-dark));
+}
+[data-theme="light"] .chip::before {
+  background: rgb(var(--c-magic-dark));
+}
+
+/* Smooth theme switch (class toggled by the theme button) */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-fade *,
+  html.theme-fade *::before,
+  html.theme-fade *::after {
+    transition:
+      background-color 0.22s ease,
+      border-color 0.22s ease,
+      color 0.22s ease,
+      box-shadow 0.22s ease,
+      fill 0.22s ease,
+      stroke 0.22s ease !important;
+  }
+}
+
+/* A11y: respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer utilities {
+  .animate-in-out {
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  }
+
+  .pixelated {
+    image-rendering: pixelated;
+  }
+}

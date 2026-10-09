@@ -1,0 +1,360 @@
+// ============================================================
+//  Loki Ti Pass — Prisma schema
+//  PostgreSQL 16
+//
+//  Запуск:  pnpm db:generate && pnpm db:migrate:dev -- --name init
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+//  Пользователи Telegram
+// ------------------------------------------------------------
+model User {
+  id        String   @id @default(cuid())
+  tgId      BigInt   @unique
+  tgUsername String?
+  firstName String?
+  lastName  String?
+  languageCode String? @default("ru")
+  isAdmin   Boolean  @default(false)
+  isBanned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players   Player[]
+  payments   Payment[]
+  tickets    Ticket[]
+  moderatedTickets Ticket[] @relation("ModeratedTickets")
+  sessions   Session[]
+  nickRequests NickRequest[]
+
+  @@index([tgUsername])
+}
+
+// Сессии JWT (позволяет мгновенно отозвать доступ выходом из кабинета)
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ------------------------------------------------------------
+//  Игроки (один Telegram-аккаунт = один Minecraft-ник)
+// ------------------------------------------------------------
+enum PlayerStatus {
+  ACTIVE    // есть доступ в текущем сезоне
+  EXPIRED   // вайпнули, нужно продление
+  PENDING   // оплачено, whitelist ещё не выдан
+  BANNED    // бан ника
+}
+
+model Player {
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  mcNick          String       @unique
+  mcNickLower     String       @unique
+  status          PlayerStatus @default(PENDING)
+
+  // сезон, в котором игрок последний раз платил / имеет доступ
+  currentSeasonId String?
+  currentSeason   Season?      @relation(fields: [currentSeasonId], references: [id], onDelete: SetNull)
+
+  totalPaid       Int          @default(0) // сумма в копейках? нет — в рублях, смотрите Payment.amount (копейки)
+  renewalCount    Int          @default(0)
+  firstPaidAt     DateTime?
+  lastPaidAt      DateTime?
+
+  // история: во всех сезонах, где игрок когда-либо покупал доступ
+  seasonAccess    PlayerSeason[]
+  payments        Payment[]
+
+  banReason       String?
+  bannedAt        DateTime?
+  bannedBy        String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([status])
+  @@index([currentSeasonId])
+}
+
+// Связь «игрок × сезон» — история проходок, сквозь вайпы
+model PlayerSeason {
+  id        String   @id @default(cuid())
+  playerId  String
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  seasonId  String
+  season    Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  status    PlayerStatus @default(PENDING)
+  grantedAt DateTime?
+  revokedAt DateTime?
+  paidAmount Int         @default(0) // копейки
+
+  @@unique([playerId, seasonId])
+  @@index([seasonId, status])
+}
+
+// ------------------------------------------------------------
+//  Сезоны / вайпы
+// ------------------------------------------------------------
+model Season {
+  id        String    @id @default(cuid())
+  number    Int       @unique
+  name      String
+  isActive  Boolean   @default(false)
+
+  priceNew  Int       // копейки (50000 = 500 ₽)
+  priceRenew Int      // копейки (20000 = 200 ₽)
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  createdAt DateTime  @default(now())
+
+  players      Player[]
+  payments     Payment[]
+  whitelistLog WhitelistLog[]
+  seasonAccess PlayerSeason[]
+
+  @@index([isActive])
+}
+// ------------------------------------------------------------
+//  Платежи
+// ------------------------------------------------------------
+enum PaymentType {
+  NEW     // первичная проходка
+  RENEW   // продление после вайпа
+  TOPUP   // прочее
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+  CANCELED
+}
+
+enum PaymentProvider {
+  YOOKASSA
+  STARS
+  MANUAL // перенос из DonationAlerts / ручное начисление админом
+}
+
+model Payment {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  seasonId  String?
+  season    Season?         @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+
+  playerId  String?
+  player    Player?         @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  amount    Int             // копейки
+  currency  String          @default("RUB")
+  type      PaymentType
+  provider  PaymentProvider @default(YOOKASSA)
+  description String?
+
+  providerPaymentId String?  @unique
+  confirmationUrl   String?  // ссылка на оплату (ссылка/инвойс YooKassa)
+  idempotencyKey    String?  @unique
+
+  status    PaymentStatus   @default(PENDING)
+  failureReason String?
+
+  createdAt DateTime        @default(now())
+  paidAt    DateTime?
+  refundedAt DateTime?
+  refundReason String?
+
+  // для Stars — id сервисного платежа
+  telegramPaymentChargeId String?
+
+  whitelistLog WhitelistLog[]
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@index([seasonId])
+}
+
+// ------------------------------------------------------------
+//  Whitelist
+// ------------------------------------------------------------
+enum WhitelistAction {
+  ADD
+  REMOVE
+}
+
+enum WhitelistActor {
+  ADMIN
+  SYSTEM
+  BOT
+  RCON_RETRY
+}
+
+model WhitelistLog {
+  id        String          @id @default(cuid())
+  mcNick    String
+  mcNickLower String
+  action    WhitelistAction
+  actor     WhitelistActor  @default(SYSTEM)
+  seasonId  String?
+  season    Season?         @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  paymentId String?
+  payment   Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  note      String?
+  createdAt DateTime        @default(now())
+
+  @@index([mcNickLower, createdAt])
+  @@index([paymentId, action])
+}
+
+// ------------------------------------------------------------
+//  Тикеты (смена ника, поддержка)
+// ------------------------------------------------------------
+enum TicketType {
+  NICK_CHANGE
+  SUPPORT
+  REFUND_REQUEST
+}
+
+enum TicketStatus {
+  OPEN
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type         TicketType
+  payload      Json
+  status       TicketStatus @default(OPEN)
+
+  moderatorId  String?
+  moderator    User?        @relation("ModeratedTickets", fields: [moderatorId], references: [id], onDelete: SetNull)
+  resolutionNote String?
+  resolvedAt   DateTime?
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([status, createdAt])
+  @@index([userId])
+}
+
+// Смена ника как отдельная сущность — проще валидировать и аудировать
+model NickRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  oldNick     String?
+  newNick     String
+  newNickLower String
+  reason      String?
+  status      TicketStatus @default(OPEN)
+  moderatorId String?
+  note        String?
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+
+  @@index([status, createdAt])
+  @@index([newNickLower])
+}
+
+// ------------------------------------------------------------
+//  Аудит всех действий админов
+// ------------------------------------------------------------
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?  // User.id (админ), либо "system"
+  actorTgId BigInt?
+  action    String   // SEASON_CREATE | PAYMENT_REFUND | PLAYER_BAN | ...
+  entity    String
+  entityId  String?
+  meta      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([action, createdAt])
+  @@index([entity, entityId])
+}
+
+// ------------------------------------------------------------
+//  Рассылки
+// ------------------------------------------------------------
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  DONE
+  FAILED
+}
+
+model Broadcast {
+  id         String         @id @default(cuid())
+  text       String
+  parseMode  String         @default("HTML")
+  status     BroadcastStatus @default(DRAFT)
+  total      Int            @default(0)
+  sent       Int            @default(0)
+  failed     Int            @default(0)
+  scheduledAt DateTime?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdBy  String?
+  createdAt  DateTime       @default(now())
+
+  @@index([status])
+}
+
+// ------------------------------------------------------------
+//  Задачи очереди (для отладки/повторов из админки)
+// ------------------------------------------------------------
+enum JobStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+  RETRYING
+}
+
+model McJob {
+  id         String    @id @default(cuid())
+  queueJobId String?   @unique
+  action     String    // whitelist_add | whitelist_remove | whitelist_clear
+  payload    Json
+  status     JobStatus @default(QUEUED)
+  attempts   Int       @default(0)
+  lastError  String?
+  paymentId  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status, createdAt])
+}

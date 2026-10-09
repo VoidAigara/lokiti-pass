@@ -1,0 +1,367 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 400" width="560" height="400">
+  <defs>
+    <clipPath id="frame">
+      <rect x="0" y="0" width="560" height="400" rx="22"/>
+    </clipPath>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C81B7A"/>
+      <stop offset="1" stop-color="#8F1160"/>
+    </linearGradient>
+    <linearGradient id="hair" gradientUnits="userSpaceOnUse" x1="0" y1="58" x2="0" y2="344">
+      <stop offset="0" stop-color="#EA2E58"/>
+      <stop offset="1" stop-color="#A51349"/>
+    </linearGradient>
+    <linearGradient id="skin" gradientUnits="userSpaceOnUse" x1="0" y1="136" x2="0" y2="344">
+      <stop offset="0" stop-color="#F9DCEC"/>
+      <stop offset="1" stop-color="#EFC3DA"/>
+    </linearGradient>
+    <linearGradient id="ledge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8E1260"/>
+      <stop offset="1" stop-color="#680B4C"/>
+    </linearGradient>
+    <pattern id="halftone" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="3" fill="#DC5A9E" opacity="0.38"/>
+      <circle cx="15" cy="15" r="3" fill="#DC5A9E" opacity="0.38"/>
+    </pattern>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.55 0"/>
+    </filter>
+    <clipPath id="pawLc">
+      <path d="M118 344
+               C 109 338 106 326 111 317
+               C 115 309 125 308 131 315
+               C 134 304 143 296 155 295
+               C 174 294 187 306 190 322
+               C 191 330 191 338 190 344
+               C 195 353 193 366 183 369
+               C 175 371 168 365 167 355
+               L 167 344
+               C 167 355 166 367 157 371
+               C 149 373 143 367 143 357
+               L 143 344
+               C 143 356 141 367 132 370
+               C 124 372 118 366 118 356 Z"/>
+    </clipPath>
+    <clipPath id="pawRc">
+      <path d="M442 344
+               C 451 338 454 326 449 317
+               C 445 309 435 308 429 315
+               C 426 304 417 296 405 295
+               C 386 294 373 306 370 322
+               C 369 330 369 338 370 344
+               C 365 353 367 366 377 369
+               C 385 371 392 365 393 355
+               L 393 344
+               C 393 355 394 367 403 371
+               C 411 373 417 367 417 357
+               L 417 344
+               C 417 356 419 367 428 370
+               C 436 372 442 366 442 356 Z"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <!-- ===== background ===== -->
+    <rect width="560" height="400" fill="url(#bg)"/>
+    <g fill="#DA559F" opacity="0.3">
+      <rect x="-80" y="-200" width="46" height="700" transform="rotate(28 0 0)"/>
+      <rect x="60" y="-200" width="24" height="700" transform="rotate(28 0 0)"/>
+      <rect x="380" y="-240" width="58" height="760" transform="rotate(28 0 0)"/>
+      <rect x="496" y="-240" width="28" height="760" transform="rotate(28 0 0)"/>
+    </g>
+    <circle cx="284" cy="226" r="190" fill="#E23F93" opacity="0.32"/>
+    <rect width="560" height="400" fill="url(#halftone)"/>
+    <g fill="#2F3EC0" opacity="0.9">
+      <rect x="44" y="128" width="34" height="11"/>
+      <rect x="62" y="146" width="16" height="7"/>
+      <rect x="482" y="298" width="36" height="11"/>
+      <rect x="466" y="314" width="18" height="7"/>
+    </g>
+    <g fill="#6749E2" opacity="0.85">
+      <rect x="492" y="152" width="24" height="8"/>
+      <rect x="36" y="304" width="28" height="9"/>
+    </g>
+    <g fill="#FFFFFF" opacity="0.16">
+      <circle cx="40" cy="64" r="4"/><circle cx="74" cy="92" r="3"/><circle cx="34" cy="126" r="2.5"/>
+      <circle cx="522" cy="332" r="4"/><circle cx="492" cy="356" r="3"/><circle cx="536" cy="302" r="2.5"/>
+      <circle cx="304" cy="38" r="3"/><circle cx="344" cy="62" r="2.5"/><circle cx="256" cy="34" r="2.5"/>
+    </g>
+    <g stroke="#FFFFFF" stroke-width="4" fill="none" opacity="0.55">
+      <path d="M86 258 c-8-12-26-8-26 6 c0 12 16 22 26 30 c10-8 26-18 26-30 c0-14-18-18-26-6z"/>
+      <path d="M472 64 c-6-9-19-6-19 4 c0 9 12 16 19 22 c7-6 19-13 19-22 c0-10-13-13-19-4z"/>
+    </g>
+    <!-- collage: giant text, scribble, glyphs, speedlines -->
+    <text x="280" y="70" text-anchor="middle" font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+          font-weight="900" font-size="76" letter-spacing="8" fill="#680B4C" opacity="0.9"
+          transform="translate(5 6)">LOKI</text>
+    <text x="280" y="70" text-anchor="middle" font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+          font-weight="900" font-size="76" letter-spacing="8" fill="#F9DCEC" stroke="#100815"
+          stroke-width="4" paint-order="stroke">LOKI</text>
+    <path d="M40 44 c14-18 40-14 40 6 c0 16-24 20-34 6 c-8-12 4-26 20-22"
+          fill="none" stroke="#EC7FB1" stroke-width="4.5" stroke-linecap="round" opacity="0.9"/>
+    <g stroke="#F9DCEC" stroke-width="4" stroke-linecap="round" opacity="0.45">
+      <path d="M534 44 l-22 36"/><path d="M544 96 l-18 30"/><path d="M530 140 l-14 24"/>
+    </g>
+    <text x="104" y="225" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="42"
+          fill="#3A4EDD" stroke="#100815" stroke-width="3" paint-order="stroke"
+          transform="rotate(-10 104 225)">?</text>
+    <text x="524" y="246" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="44"
+          fill="#3A4EDD" stroke="#100815" stroke-width="3" paint-order="stroke"
+          transform="rotate(8 524 246)">!</text>
+    <path d="M48 206 l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#CDE7FA" stroke="#100815" stroke-width="3"/>
+    <g>
+      <path d="M70 314 L83 338 H57 Z" fill="#E83A63" stroke="#100815" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M70 321 v8" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="70" cy="334" r="1.8" fill="#FFFFFF"/>
+    </g>
+
+    <!-- ===== character ===== -->
+    <g stroke="#100815" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+      <!-- chroma under-stroke (electric blue rim) -->
+      <g fill="none" stroke="#3A4EDD" stroke-width="18" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M280 58
+                 C 186 58 132 126 134 212
+                 C 135 264 124 306 116 344
+                 L 444 344
+                 C 436 306 425 264 426 212
+                 C 428 126 374 58 280 58 Z"/>
+        <path d="M282 62 C 288 48 298 40 312 36"/>
+        <g transform="translate(314 24) rotate(10)">
+          <path d="M0 10 C -11 1 -17 -6 -15 -12 C -13 -18 -6 -19 -2.5 -14 C -0.8 -16.5 2.5 -16.5 4 -14 C 8 -19 16 -18 17.5 -12 C 19 -6 12 1 0 10 Z"/>
+        </g>
+        <path d="M198 94 C 176 62 178 32 197 16 C 216 38 226 64 228 90 Z"/>
+        <path d="M362 94 C 384 62 382 32 363 16 C 344 38 334 64 332 90 Z"/>
+      </g>
+      <!-- back hair -->
+      <path fill="url(#hair)"
+        d="M280 58
+           C 186 58 132 126 134 212
+           C 135 264 124 306 116 344
+           L 444 344
+           C 436 306 425 264 426 212
+           C 428 126 374 58 280 58 Z"/>
+      <!-- heart ahoge -->
+      <path fill="none" stroke-width="7" d="M282 62 C 288 48 298 40 312 36"/>
+      <g transform="translate(314 24) rotate(10)">
+        <path fill="url(#hair)" stroke-width="5.5"
+          d="M0 10 C -11 1 -17 -6 -15 -12 C -13 -18 -6 -19 -2.5 -14 C -0.8 -16.5 2.5 -16.5 4 -14 C 8 -19 16 -18 17.5 -12 C 19 -6 12 1 0 10 Z"/>
+      </g>
+      <!-- deep hair tone on the right side -->
+      <path stroke="none" fill="#7C0F45" opacity="0.85"
+        d="M368 70 C 402 104 422 158 424 214 C 426 270 436 310 444 344 L 392 344 C 400 300 402 250 400 210 C 396 150 386 104 368 70 Z"/>
+      <!-- horns -->
+      <path fill="#1A0E22" d="M198 94 C 176 62 178 32 197 16 C 216 38 226 64 228 90 Z"/>
+      <path fill="#1A0E22" d="M362 94 C 384 62 382 32 363 16 C 344 38 334 64 332 90 Z"/>
+
+      <!-- face: soft jaw, tapered chin -->
+      <path fill="url(#skin)"
+        d="M164 228
+           C 164 176 218 140 280 140
+           C 342 140 396 176 396 228
+           C 396 266 388 298 366 318
+           C 344 336 314 342 280 342
+           C 246 342 216 336 194 318
+           C 172 298 164 266 164 228 Z"/>
+      <path fill="#DB93BA" opacity="0.85" stroke="none"
+        d="M396 228 C 396 268 387 300 365 320 C 377 300 385 268 384 232 Z"/>
+      <path fill="#DB93BA" opacity="0.65" stroke="none"
+        d="M194 318 C 216 336 246 342 280 342 C 314 342 344 336 366 318 C 350 332 316 338 280 338 C 244 338 210 332 194 318 Z"/>
+
+      <!-- forehead shadow under the fringe -->
+      <path fill="none" stroke="#E7A9C6" stroke-width="16"
+        d="M168 196 L202 212 L226 244 L254 208 L278 250 L306 206 L330 242 L356 210 L378 236 L396 204"/>
+
+      <!-- side locks -->
+      <path fill="url(#hair)" d="M172 188 C 158 240 158 296 170 344 L 208 344 C 192 300 190 240 200 196 Z"/>
+      <path fill="url(#hair)" d="M388 188 C 402 240 402 296 390 344 L 352 344 C 368 300 370 240 360 196 Z"/>
+
+      <!-- eyes: tall almond, heavy upper lash, pink iris crescent, twin glints -->
+      <path fill="#22102A" stroke-width="5"
+        d="M206 264 C 204 238 216 218 240 218 C 262 218 270 236 268 258 C 267 284 254 300 236 300 C 216 300 207 284 206 264 Z"/>
+      <path fill="#22102A" stroke-width="5"
+        d="M356 264 C 358 238 346 218 322 218 C 300 218 292 236 294 258 C 295 284 308 300 326 300 C 346 300 355 284 356 264 Z"/>
+      <g stroke="#100815" stroke-width="9" fill="none">
+        <path d="M205 263 C 204 237 217 216 241 216 C 264 216 274 237 272 261"/>
+        <path d="M357 263 C 358 237 345 216 321 216 C 298 216 288 237 290 261"/>
+      </g>
+      <g stroke="#100815" stroke-width="7" fill="none">
+        <path d="M206 260 l-15 -11"/>
+        <path d="M356 260 l15 -11"/>
+        <path d="M214 294 l-9 7"/>
+        <path d="M348 294 l9 7"/>
+      </g>
+      <g stroke="none">
+        <path fill="#E02450" d="M213 275 C 218 296 256 297 263 273 C 256 282 247 285 238 285 C 228 285 218 281 213 275 Z"/>
+        <path fill="#E02450" d="M349 275 C 344 296 306 297 299 273 C 306 282 315 285 324 285 C 334 285 344 281 349 275 Z"/>
+        <ellipse cx="237" cy="255" rx="15" ry="17" fill="#16081A"/>
+        <ellipse cx="325" cy="255" rx="15" ry="17" fill="#16081A"/>
+        <circle cx="246" cy="238" r="10" fill="#FFFFFF"/>
+        <circle cx="340" cy="238" r="10" fill="#FFFFFF"/>
+        <circle cx="219" cy="270" r="4.5" fill="#FFFFFF"/>
+        <circle cx="305" cy="271" r="4.5" fill="#FFFFFF"/>
+      </g>
+      <!-- bangs: chunky fringe, varied tips (top merges into hair) -->
+      <path fill="url(#hair)" stroke="none"
+        d="M280 88
+           C 212 88 170 130 168 196
+           L 202 212 L 226 244 L 254 208 L 278 250 L 306 206 L 330 242 L 356 210 L 378 236 L 396 204
+           C 394 132 348 88 280 88 Z"/>
+      <path fill="none" stroke-width="6"
+        d="M168 196 L202 212 L226 244 L254 208 L278 250 L306 206 L330 242 L356 210 L378 236 L396 204"/>
+
+      <!-- hair gloss -->
+      <path stroke="none" fill="#FFFFFF" opacity="0.26"
+        d="M204 142 C 240 112 330 108 364 136 C 354 128 328 120 298 122 C 258 124 222 132 204 142 Z"/>
+      <path stroke="none" fill="#FFFFFF" opacity="0.2"
+        d="M226 168 C 224 186 228 202 234 214 C 238 204 236 186 240 170 Z"/>
+      <g stroke="#A51349" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85">
+        <path d="M212 116 C 204 140 201 162 203 184"/>
+        <path d="M348 116 C 356 140 359 162 357 184"/>
+        <path d="M276 102 C 274 116 274 126 276 136"/>
+      </g>
+
+
+      <!-- blush -->
+      <g stroke="none" fill="#EC7FB1" opacity="0.95">
+        <ellipse cx="190" cy="302" rx="19" ry="9"/>
+        <ellipse cx="372" cy="302" rx="19" ry="9"/>
+      </g>
+      <g stroke="#D25288" stroke-width="3.5" fill="none" opacity="0.95">
+        <path d="M177 296 l-3 11 M187 294 l-3 12 M197 296 l-3 11"/>
+        <path d="M367 296 l-3 11 M377 294 l-3 12 M387 296 l-3 11"/>
+      </g>
+
+      <!-- mouth: soft teasing smile with a tiny fang -->
+      <path d="M266 310 q14 16 30 0" fill="none" stroke-width="6"/>
+      <path d="M285 311 L296 311 L290.5 322 Z" fill="#FFFFFF" stroke="#100815" stroke-width="3" stroke-linejoin="round"/>
+
+      <!-- clips -->
+      <path fill="#CBE3F5" stroke-width="5"
+        d="M196 158 l9 20 22 3-16 15 4 22-19-10-19 10 4-22-16-15 22-3z"/>
+      <g stroke="#2F3EC0" stroke-width="9" stroke-linecap="round" transform="rotate(8 358 154)">
+        <path d="M346 142 l24 24 M370 142 l-24 24"/>
+      </g>
+      <g transform="translate(380 216) rotate(14)">
+        <path fill="#F0B4CF" stroke-width="5" stroke-linejoin="round"
+          d="M0 12 C -14 2 -22 -6 -20 -14 C -18 -21 -8 -22 -3 -16 C -1 -19 3 -19 5 -16 C 10 -22 20 -21 22 -14 C 24 -6 16 2 0 12 Z"/>
+      </g>
+
+      <!-- ===== ledge ===== -->
+      <path fill="url(#ledge)" stroke-width="6" d="M0 344 L560 344 L560 400 L0 400 Z"/>
+      <path d="M0 353 H560" stroke="#DA559F" stroke-width="4" opacity="0.5" fill="none"/>
+      <g stroke="#F2C7DC" stroke-width="5" fill="none" opacity="0.95">
+        <path d="M64 366 c-7-9-21-6-21 5 c0 10 13 17 21 24 c8-7 21-14 21-24 c0-11-14-14-21-5z"/>
+        <path d="M455 255 l5 12 12 5-12 5-5 12-5-12-12-5 12-5z"/>
+      </g>
+      <g fill="#F2C7DC">
+        <circle cx="498" cy="374" r="5"/><circle cx="518" cy="374" r="5"/><circle cx="538" cy="374" r="5"/>
+      </g>
+      <text x="280" y="390" text-anchor="middle" font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+            font-weight="900" font-size="21" letter-spacing="4" fill="#F9DCEC" stroke="#100815"
+            stroke-width="3" paint-order="stroke">LOKI PASS</text>
+      <g stroke="#F2C7DC" stroke-width="4" fill="none">
+        <circle cx="472" cy="374" r="14"/>
+        <path d="M464 377 q8 9 16 0"/>
+      </g>
+      <g fill="#F2C7DC">
+        <circle cx="467" cy="369" r="2.2"/><circle cx="477" cy="369" r="2.2"/>
+      </g>
+
+      <!-- ===== paws hooked over the edge ===== -->
+      <g fill="none" stroke="#3A4EDD" stroke-width="18" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M118 344
+                 C 109 338 106 326 111 317
+                 C 115 309 125 308 131 315
+                 C 134 304 143 296 155 295
+                 C 174 294 187 306 190 322
+                 C 191 330 191 338 190 344
+                 C 195 353 193 366 183 369
+                 C 175 371 168 365 167 355
+                 L 167 344
+                 C 167 355 166 367 157 371
+                 C 149 373 143 367 143 357
+                 L 143 344
+                 C 143 356 141 367 132 370
+                 C 124 372 118 366 118 356 Z"/>
+        <path d="M442 344
+                 C 451 338 454 326 449 317
+                 C 445 309 435 308 429 315
+                 C 426 304 417 296 405 295
+                 C 386 294 373 306 370 322
+                 C 369 330 369 338 370 344
+                 C 365 353 367 366 377 369
+                 C 385 371 392 365 393 355
+                 L 393 344
+                 C 393 355 394 367 403 371
+                 C 411 373 417 367 417 357
+                 L 417 344
+                 C 417 356 419 367 428 370
+                 C 436 372 442 366 442 356 Z"/>
+      </g>
+      <g fill="url(#skin)">
+        <path d="M118 344
+                 C 109 338 106 326 111 317
+                 C 115 309 125 308 131 315
+                 C 134 304 143 296 155 295
+                 C 174 294 187 306 190 322
+                 C 191 330 191 338 190 344
+                 C 195 353 193 366 183 369
+                 C 175 371 168 365 167 355
+                 L 167 344
+                 C 167 355 166 367 157 371
+                 C 149 373 143 367 143 357
+                 L 143 344
+                 C 143 356 141 367 132 370
+                 C 124 372 118 366 118 356 Z"/>
+        <path d="M442 344
+                 C 451 338 454 326 449 317
+                 C 445 309 435 308 429 315
+                 C 426 304 417 296 405 295
+                 C 386 294 373 306 370 322
+                 C 369 330 369 338 370 344
+                 C 365 353 367 366 377 369
+                 C 385 371 392 365 393 355
+                 L 393 344
+                 C 393 355 394 367 403 371
+                 C 411 373 417 367 417 357
+                 L 417 344
+                 C 417 356 419 367 428 370
+                 C 436 372 442 366 442 356 Z"/>
+      </g>
+      <g stroke="none" fill="#251530">
+        <g clip-path="url(#pawLc)">
+          <ellipse cx="130" cy="364" rx="13" ry="9"/>
+          <ellipse cx="155" cy="367" rx="13" ry="9"/>
+          <ellipse cx="179" cy="363" rx="13" ry="9"/>
+        </g>
+        <g clip-path="url(#pawRc)">
+          <ellipse cx="430" cy="364" rx="13" ry="9"/>
+          <ellipse cx="405" cy="367" rx="13" ry="9"/>
+          <ellipse cx="381" cy="363" rx="13" ry="9"/>
+        </g>
+      </g>
+      <g stroke-width="5" fill="none">
+        <path d="M143 312 C 140 324 141 334 143 344"/>
+        <path d="M167 312 C 170 324 170 334 167 344"/>
+        <path d="M417 312 C 420 324 419 334 417 344"/>
+        <path d="M393 312 C 390 324 390 334 393 344"/>
+        <path d="M124 326 c4 4 10 5 14 2 M148 329 c4 4 10 5 14 2 M172 325 c4 4 10 5 14 2"/>
+        <path d="M436 326 c-4 4-10 5-14 2 M412 329 c-4 4-10 5-14 2 M388 325 c-4 4-10 5-14 2"/>
+      </g>
+    </g>
+
+    <rect width="560" height="400" filter="url(#grain)" opacity="0.17" style="mix-blend-mode:overlay"/>
+    <!-- ===== foreground decor ===== -->
+    <g transform="translate(456 170) rotate(-12)">
+      <path d="M0 0 L0 62 L16 48 L26 74 L40 68 L30 42 L50 40 Z"
+            fill="#FFFFFF" stroke="#100815" stroke-width="6" stroke-linejoin="round"/>
+    </g>
+    <path d="M128 96 l7 18 18 7-18 7-7 18-7-18-18-7 18-7z" fill="#4E97E8" stroke="#100815" stroke-width="4"/>
+    <path d="M486 118 l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="#E83A63" stroke="#100815" stroke-width="4"/>
+    <path d="M434 66 l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#CDE7FA" stroke="#100815" stroke-width="4"/>
+    <circle cx="76" cy="196" r="6" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="512" cy="262" r="5" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+  <rect x="3" y="3" width="554" height="394" rx="20" fill="none" stroke="#100815" stroke-width="8"/>
+</svg>
