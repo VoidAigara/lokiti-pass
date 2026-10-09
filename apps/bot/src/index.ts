@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Bot } from "grammy";
+import { Bot, session } from "grammy";
 import { conversations, createConversation, type ConversationFn } from "@grammyjs/conversations";
 import { BOT_COMMANDS } from "@loki/shared";
 
@@ -85,6 +85,10 @@ bot.api.config.use(async (prev, method, payload) => {
 // ---------------------------------------------------------- middleware
 bot.use(errorBoundary);
 bot.use(rateLimit);
+// @grammyjs/conversations требует session-middleware (иначе «Cannot use
+// conversations without session!» на каждом апдейте). Дефолт — in-memory
+// Map: хватает для диалогов, состояние живёт до перезапуска процесса.
+bot.use(session());
 bot.use(conversations());
 registerMenus(bot);
 
