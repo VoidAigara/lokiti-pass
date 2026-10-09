@@ -2,7 +2,9 @@ export * from "./constants.js";
 export * from "./money.js";
 export * from "./validation.js";
 export * from "./pricing.js";
-export * from "./telegram-auth.js";
+// telegram-auth НЕ реэкспортируется из бочки: он тянет node:crypto и
+// ломает клиентскую сборку Next.js. Импорт серверного кода:
+// import { ... } from "@loki/shared/telegram-auth"
 export * from "./types.js";
 
 /** Тексты бота/сайта, чтобы не дублировать. */

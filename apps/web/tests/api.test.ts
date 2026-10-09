@@ -38,7 +38,7 @@ describe("api(): запрос", () => {
     const res = await api<{ ok: boolean }>("/me");
     expect(res).toEqual({ ok: true });
     const { url, init } = calls[0];
-    expect(url).toBe("http://localhost:3001/me");
+    expect(url).toBe("/api/me");
     expect(init.method).toBe("GET");
     expect(init.credentials).toBe("include");
     expect((init.headers as Record<string, string>).Accept).toBe(
@@ -110,14 +110,14 @@ describe("обёртки", () => {
   it("loginWithTelegram шлёт initData POST-ом на /auth/webapp", async () => {
     await loginWithTelegram("user=1&hash=abc");
     const { url, init } = calls[0];
-    expect(url).toBe("http://localhost:3001/auth/webapp");
+    expect(url).toBe("/api/auth/webapp");
     expect(init.method).toBe("POST");
     expect(JSON.parse(init.body as string)).toEqual({ initData: "user=1&hash=abc" });
   });
 
   it("getMe гетит /me", async () => {
     await getMe();
-    expect(calls[0].url).toBe("http://localhost:3001/me");
+    expect(calls[0].url).toBe("/api/me");
   });
 
   it("errorMessage: свой текст ошибок, иначе заглушка", () => {

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { validateTelegramInitData } from "@loki/shared";
+import { validateTelegramInitData } from "@loki/shared/telegram-auth";
 import { env, adminTgIds, isProd } from "../config.js";
 import { hashToken, signAccessToken, JWT_TTL_SECONDS } from "../lib/jwt.js";
 import { isInternalTokenValid } from "../lib/internal.js";

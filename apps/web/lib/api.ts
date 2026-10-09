@@ -3,8 +3,10 @@
 import type { ApiError, MeResponse, CreatePaymentResponse } from "@loki/shared";
 import type { PublicSeasonResponse, PublicStatusResponse } from "./types";
 
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+// Относительный путь: браузер зовёт /api/* того же origin. Локально это
+// Next rewrite (см. next.config.mjs), во внешнем доступе — public-proxy
+// (scripts/public-proxy.mjs). Один и тот же код работает и там, и там.
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 // Сессия живёт в httpOnly-cookie `loki_token` (её ставит API на /auth/webapp).
 // Токен в localStorage не храним: XSS не сможет украсть сессию,

@@ -135,7 +135,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
         NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL:-http://localhost:3000}
         NEXT_PUBLIC_BOT_USERNAME: ${NEXT_PUBLIC_BOT_USERNAME:-}
         NEXT_PUBLIC_MC_IP: ${NEXT_PUBLIC_MC_IP:-play.lokiti.ru}
@@ -149,6 +149,8 @@ services:
       NODE_ENV: production
       PORT: 3000
       NEXT_TELEMETRY_DISABLED: "1"
+      # next.config.mjs rewrites: /api/* → API (local/docker parity)
+      API_URL: http://api:3001
     depends_on:
       api:
         condition: service_healthy

@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./telegram-auth": {
+      "types": "./dist/telegram-auth.d.ts",
+      "default": "./dist/telegram-auth.js"
     }
   },
   "files": [

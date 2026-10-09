@@ -1,10 +1,13 @@
 const standalone = process.env.NEXT_OUTPUT === "standalone";
 
 // Origin API для CSP connect-src (сюда уходят запросы из lib/api.ts).
+// "/api" — относительный путь: запросы same-origin, дополнительный origin
+// в CSP не нужен.
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 const apiOrigin = (() => {
+  if (rawApiUrl.startsWith("/")) return "";
   try {
-    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001")
-      .origin;
+    return new URL(rawApiUrl).origin;
   } catch {
     return "http://localhost:3001";
   }
@@ -18,7 +21,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiOrigin}`,
+  `connect-src 'self'${apiOrigin ? ` ${apiOrigin}` : ""}`,
   // сайт сам может открывать ссылки Telegram; сам он — только в Telegram
   "frame-src 'self' https://web.telegram.org",
   // Mini App — iframe внутри Telegram Web: фреймить может только он
@@ -49,6 +52,15 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [],
   },
+  // Локальная разработка/докер: /api/* пробрасывается в API-сервис напрямую.
+  // При публичном доступе тот же /api обрабатывает scripts/public-proxy.mjs.
+  async rewrites() {
+    const backend = (process.env.API_URL ?? "http://127.0.0.1:3001").replace(
+      /\/+$/,
+      ""
+    );
+    return [{ source: "/api/:path*", destination: `${backend}/:path*` }];
+  },
   async headers() {
     return [
       {
@@ -71,7 +83,7 @@ const nextConfig = {
     ];
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
     NEXT_PUBLIC_WEB_URL: process.env.NEXT_PUBLIC_WEB_URL ?? "http://localhost:3000",
     NEXT_PUBLIC_BOT_USERNAME: process.env.NEXT_PUBLIC_BOT_USERNAME ?? "",
     NEXT_PUBLIC_MC_IP: process.env.NEXT_PUBLIC_MC_IP ?? "play.lokiti.ru",

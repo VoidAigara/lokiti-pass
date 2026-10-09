@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from "jose";
-import { sha256Hex } from "@loki/shared";
+import { sha256Hex } from "@loki/shared/telegram-auth";
 import { env } from "../config.js";
 
 const secret = new TextEncoder().encode(env.JWT_SECRET);
