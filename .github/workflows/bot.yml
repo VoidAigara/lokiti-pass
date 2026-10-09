@@ -24,6 +24,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Раннер входит в tailnet как эфемерный узел — так он видит API
+      # у домашней машины (https://aigaravoid.tail68a233.ts.net).
+      - name: join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          flags: --accept-dns=true
+
       - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
