@@ -86,9 +86,11 @@ bot.api.config.use(async (prev, method, payload) => {
 bot.use(errorBoundary);
 bot.use(rateLimit);
 // @grammyjs/conversations требует session-middleware (иначе «Cannot use
-// conversations without session!» на каждом апдейте). Дефолт — in-memory
-// Map: хватает для диалогов, состояние живёт до перезапуска процесса.
-bot.use(session());
+// conversations without session!» на каждом апдейте). initial ОБЯЗАТЕЛЕН:
+// без него grammY отдаёт undefined для новых пользователей и конверсии падают
+// с «Cannot read properties of undefined (reading 'conversation')».
+// In-memory Map: хватает для диалогов, состояние живёт до перезапуска.
+bot.use(session({ initial: () => ({}) }));
 bot.use(conversations());
 registerMenus(bot);
 
@@ -268,19 +270,6 @@ bot
       void bot.api
         .setMyCommands(BOT_COMMANDS.map((c) => ({ ...c })))
         .catch((err) => console.error("[bot] setMyCommands:", err));
-      // Кнопка приложения в шапке чата (как у Telegram Wallet) — глобальное
-      // меню Mini App, открывает WEB_URL с initData (автологин на сайте).
-      if (botEnv.WEB_URL.startsWith("https://")) {
-        void bot.api
-          .setChatMenuButton({
-            menu_button: {
-              type: "web_app",
-              text: "🛒 Проходка",
-              web_app: { url: botEnv.WEB_URL },
-            },
-          })
-          .catch((err) => console.error("[bot] setChatMenuButton:", err));
-      }
       if (!healthTimer) {
         healthTimer = setInterval(() => void healthMonitor.check(), 60_000);
         void healthMonitor.check();
