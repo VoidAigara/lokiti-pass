@@ -268,6 +268,19 @@ bot
       void bot.api
         .setMyCommands(BOT_COMMANDS.map((c) => ({ ...c })))
         .catch((err) => console.error("[bot] setMyCommands:", err));
+      // Кнопка приложения в шапке чата (как у Telegram Wallet) — глобальное
+      // меню Mini App, открывает WEB_URL с initData (автологин на сайте).
+      if (botEnv.WEB_URL.startsWith("https://")) {
+        void bot.api
+          .setChatMenuButton({
+            menu_button: {
+              type: "web_app",
+              text: "🛒 Проходка",
+              web_app: { url: botEnv.WEB_URL },
+            },
+          })
+          .catch((err) => console.error("[bot] setChatMenuButton:", err));
+      }
       if (!healthTimer) {
         healthTimer = setInterval(() => void healthMonitor.check(), 60_000);
         void healthMonitor.check();
