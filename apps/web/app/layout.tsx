@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Unbounded } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -98,13 +96,8 @@ export default function RootLayout({
         />
       </head>
       <body className="relative min-h-screen overflow-x-hidden">
-        <AuthProvider>
-          <div className="relative z-10 flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </AuthProvider>
+        {/* Header/Footer живут в app/(site)/layout — /app (Mini App) их не получает */}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

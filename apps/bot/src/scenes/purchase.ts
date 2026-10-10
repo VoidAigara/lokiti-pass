@@ -134,15 +134,17 @@ export async function purchaseConversation(
   }
 }
 
-async function sendStarsInvoice(
+/** Отправляет инвойс Telegram Stars (вызывается из сценария покупки и из
+ * deep-link /start?start=stars — из Mini App, где нет своей кнопки оплаты). */
+export async function sendStarsInvoice(
   ctx: Ctx,
-  forceType: "NEW" | "RENEW"
+  forceType?: "NEW" | "RENEW"
 ): Promise<void> {
   try {
     const inv = await callApi<StarsInvoiceResponse>(
       ctx,
       "/payments/stars/invoice",
-      { method: "POST", body: { type: forceType } }
+      { method: "POST", body: forceType ? { type: forceType } : {} }
     );
 
     // эталон приходит от API — он же используется при сверке при подтверждении

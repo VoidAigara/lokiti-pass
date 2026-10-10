@@ -15,6 +15,7 @@ import { supportConversation } from "./scenes/support.js";
 import {
   purchaseConversation,
   handleStarsPayment,
+  sendStarsInvoice,
 } from "./scenes/purchase.js";
 import { profileHandler, startHandler } from "./scenes/profile.js";
 
@@ -95,7 +96,15 @@ bot.use(conversations());
 registerMenus(bot);
 
 // ---------------------------------------------------------- команды
-bot.command("start", startHandler);
+// Deep-link из Mini App: t.me/<bot>?start=stars → сразу инвойс Stars.
+bot.command("start", async (ctx) => {
+  const payload = typeof ctx.match === "string" ? ctx.match.trim() : "";
+  if (payload === "stars" || payload === "stars_renew") {
+    await sendStarsInvoice(ctx, payload === "stars_renew" ? "RENEW" : "NEW");
+    return;
+  }
+  await startHandler(ctx);
+});
 bot.command("help", (ctx) =>
   ctx.reply(texts.help, { parse_mode: "HTML", reply_markup: mainKeyboard })
 );
@@ -138,6 +147,27 @@ bot.hears(BTN.cancel, async (ctx) => {
   await ctx.conversation.exit().catch(() => undefined);
   await ctx.reply("Готово.", { reply_markup: mainKeyboard });
 });
+
+// ---------------------------------------------------------- мини-апп
+// Отдельный WebAppInfo вместо ссылки: WebApp-кнопки открывают страницу
+// внутри веб-вью Telegram (с initData, автологином и haptics).
+const openMiniApp = async (ctx: BotContext) => {
+  await ctx.reply(texts.miniApp, {
+    parse_mode: "HTML",
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "📱 Открыть кабинет",
+            web_app: { url: `${botEnv.WEB_URL}/app` },
+          },
+        ],
+      ],
+    },
+  });
+};
+bot.command("app", openMiniApp);
+bot.hears(BTN.miniapp, openMiniApp);
 
 // ---------------------------------------------------------- оплата Stars
 bot.on("message:successful_payment", handleStarsPayment);

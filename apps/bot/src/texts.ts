@@ -12,6 +12,7 @@ export const BTN = {
   renew: "♻️ Продлить",
   profile: "👤 Кабинет",
   support: "🆘 Поддержка",
+  miniapp: "📱 Мини-апп",
   back: "↩️ Назад",
   cancel: "✖️ Отмена",
 } as const;
@@ -19,11 +20,13 @@ export const BTN = {
 /**
  * Кнопки главного меню — обычные текстовые: нажатие отправляет текст в чат,
  * где его подхватывает bot.hears() и открывает сцену в чате.
+ * «Мини-апп» — текстовая: по нажатию бот шлёт inline-кнопку WebAppInfo.
  */
 export const mainKeyboard = {
   keyboard: [
     [{ text: BTN.buy }, { text: BTN.renew }],
     [{ text: BTN.profile }, { text: BTN.support }],
+    [{ text: BTN.miniapp }],
   ],
   resize_keyboard: true,
   is_persistent: true,
@@ -46,9 +49,18 @@ export const texts = {
       `🎮 Сейчас онлайн: смотри на сайте`,
       `🧾 Первый вход — <b>${formatKopecks(DEFAULT_PRICE_NEW_KOPECKS)}</b>, продление после вайпа — <b>${formatKopecks(DEFAULT_PRICE_RENEW_KOPECKS)}</b>`,
       "",
+      "📱 <b>Мини-апп</b> — кабинет, покупка и статус сервера прямо в Telegram (кнопка ниже или /app).",
+      "",
       "Выбери действие ниже 👇",
     ].join("\n");
   },
+
+  miniApp: [
+    "📱 <b>Мини-апп Loki Ti</b>",
+    "",
+    "Профиль и платежи, покупка проходки и статус сервера — в одном окне.",
+    "Вход автоматический, по данным Telegram.",
+  ].join("\n"),
 
   help: [
     "📖 <b>Справка</b>",
@@ -59,6 +71,7 @@ export const texts = {
     "/me — профиль, статус и история",
     "/nick — привязать или сменить ник",
     "/support — тикет в поддержку",
+    "/app — мини-апп (кабинет в Telegram)",
     "/help — эта справка",
     "",
     "Админам: /admin — панель управления.",

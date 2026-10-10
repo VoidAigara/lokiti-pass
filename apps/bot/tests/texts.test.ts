@@ -29,7 +29,7 @@ describe("клавиатуры: регресс «кнопки без сайта�
     expect(mainKeyboard.resize_keyboard).toBe(true);
     expect(mainKeyboard.is_persistent).toBe(true);
     const rows = mainKeyboard.keyboard as { text: string }[][];
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(3);
     for (const row of rows) {
       for (const btn of row) {
         expect(Object.keys(btn).sort()).toEqual(["text"]);
@@ -38,7 +38,13 @@ describe("клавиатуры: регресс «кнопки без сайта�
       }
     }
     const labels = rows.flat().map((b) => b.text);
-    expect(labels).toEqual([BTN.buy, BTN.renew, BTN.profile, BTN.support]);
+    expect(labels).toEqual([
+      BTN.buy,
+      BTN.renew,
+      BTN.profile,
+      BTN.support,
+      BTN.miniapp,
+    ]);
     for (const label of labels) {
       expect(label).not.toMatch(/https?:/i);
       expect(label).not.toMatch(/pass\.lokiti/);
@@ -55,6 +61,7 @@ describe("клавиатуры: регресс «кнопки без сайта�
     expect(BTN.renew).toBe("♻️ Продлить");
     expect(BTN.profile).toBe("👤 Кабинет");
     expect(BTN.support).toBe("🆘 Поддержка");
+    expect(BTN.miniapp).toBe("📱 Мини-апп");
     expect(BTN.back).toBe("↩️ Назад");
     expect(BTN.cancel).toBe("✖️ Отмена");
   });
@@ -80,7 +87,7 @@ describe("texts.start / help", () => {
   });
 
   it("help перечисляет все команды", () => {
-    for (const cmd of ["/start", "/buy", "/renew", "/me", "/nick", "/support", "/help"]) {
+    for (const cmd of ["/start", "/buy", "/renew", "/me", "/nick", "/support", "/app", "/help"]) {
       expect(texts.help).toContain(cmd);
     }
   });

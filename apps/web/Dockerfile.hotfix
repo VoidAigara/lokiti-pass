@@ -10,5 +10,10 @@
 #
 # On the VPS with registry access use the normal `docker compose build` instead.
 FROM loki-web:latest
+# Base-образ работает от USER node — rm от него получает Permission denied
+# на root-файлах, поэтому поднимаемся в root и возвращаемся обратно.
+USER root
+RUN rm -rf /app/apps/web/.next /app/apps/web/public
 COPY .next /app/apps/web/.next
 COPY public /app/apps/web/public
+USER node

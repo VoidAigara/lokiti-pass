@@ -43,6 +43,7 @@ export const BOT_COMMANDS = [
   { command: "me", description: "Мой профиль" },
   { command: "nick", description: "Привязать / сменить ник" },
   { command: "support", description: "Написать в поддержку" },
+  { command: "app", description: "Мини-апп (кабинет)" },
   { command: "admin", description: "Панель администратора" },
   { command: "help", description: "Справка" },
 ] as const;
