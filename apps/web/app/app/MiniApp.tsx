@@ -43,16 +43,16 @@ type Tab = "profile" | "buy" | "server";
 const NICK_RE = MC_NICK_REGEX;
 
 export function MiniApp() {
-  const { status, me, refresh, logout } = useAuth();
+  const { status, me, refresh, logout, error } = useAuth();
   const [tab, setTab] = useState<Tab>("profile");
 
   if (status === "idle" || status === "loading") {
     return <Splash />;
   }
 
-  if (status === "anon" || status === "error" || !me) {
-    return <OutsideTelegram />;
-  }
+  // Вне Telegram (обычный браузер) мини-апп тоже полностью рабочий:
+  // цены, сезон и статус сервера видны сразу, вход/оплата — через Telegram.
+  const authed = status === "ready" && me !== null;
 
   return (
     <div className="ma-root">
@@ -74,9 +74,16 @@ export function MiniApp() {
       </header>
 
       <main className="ma-body">
-        {tab === "profile" && (
-          <ProfileScreen me={me} onBuy={() => setTab("buy")} />
-        )}
+        {tab === "profile" &&
+          (me ? (
+            <ProfileScreen me={me} onBuy={() => setTab("buy")} />
+          ) : (
+            <ProfileGate
+              apiError={status === "error" ? error : null}
+              onRetry={() => void refresh()}
+              onBuy={() => setTab("buy")}
+            />
+          ))}
         {tab === "buy" && <BuyScreen me={me} onDone={() => void refresh()} />}
         {tab === "server" && <ServerScreen />}
       </main>
@@ -103,14 +110,102 @@ export function MiniApp() {
         />
       </nav>
 
-      <button type="button" className="ma-logout" onClick={() => void logout()}>
-        <LogOut className="h-3.5 w-3.5" /> Выйти
-      </button>
+      {authed && (
+        <button type="button" className="ma-logout" onClick={() => void logout()}>
+          <LogOut className="h-3.5 w-3.5" /> Выйти
+        </button>
+      )}
     </div>
   );
 }
 
 // ------------------------------------------------------------- screens
+
+/** Экран профиля без входа: честная витрина + вход через Telegram
+ * (или экран ошибки API, если Telegram уже есть, но сервер недоступен). */
+function ProfileGate({
+  apiError,
+  onRetry,
+  onBuy,
+}: {
+  apiError: string | null;
+  onRetry: () => void;
+  onBuy: () => void;
+}) {
+  return (
+    <div className="ma-screen">
+      <section className="ma-hero">
+        <div className="ma-avatar">?</div>
+        <div className="ma-hero-info">
+          <div className="ma-hero-name">Профиль игрока</div>
+          <div className="ma-hero-chips">
+            <span className="ma-chip ma-chip-mute">вход через Telegram</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="ma-block ma-center">
+        {apiError ? (
+          <>
+            <ShieldAlert className="ma-big-warn" />
+            <p className="ma-block-title" style={{ justifyContent: "center" }}>
+              Сервер недоступен
+            </p>
+            <p className="ma-empty">{apiError}</p>
+            <Button onClick={onRetry}>
+              <RefreshCw className="h-4 w-4" /> Повторить
+            </Button>
+          </>
+        ) : (
+          <>
+            <UserRound className="ma-big-ok" />
+            <p className="ma-block-title" style={{ justifyContent: "center" }}>
+              Войди, чтобы увидеть профиль
+            </p>
+            <p className="ma-empty">
+              Статус проходки, история платежей и обращения открываются по
+              данным Telegram — без паролей.
+              <br />
+              <br />
+              Цены и статус сервера — во вкладках <b>«Купить»</b> и{" "}
+              <b>«Сервер»</b>, работают без входа.
+            </p>
+            <div className="ma-actions">
+              <Button
+                onClick={() => {
+                  haptic("medium");
+                  openBot("/start");
+                }}
+              >
+                <Send className="h-4 w-4" /> Открыть в Telegram
+              </Button>
+              <a href={deepLink("/start")} target="_blank" rel="noreferrer">
+                <Button variant="glass">По ссылке</Button>
+              </a>
+            </div>
+          </>
+        )}
+      </section>
+
+      <section className="ma-block">
+        <h2 className="ma-block-title">
+          <Sparkles className="h-4 w-4" /> Что внутри
+        </h2>
+        <div className="ma-cta" role="button" tabIndex={0} onClick={onBuy}>
+          <div>
+            <div className="ma-cta-label">Проходка на сезон</div>
+            <div className="ma-cta-price">от 200 ₽</div>
+          </div>
+          <ArrowRight className="h-5 w-5" />
+        </div>
+        <p className="ma-empty">
+          Первый вход — 500 ₽, продление после вайпа — 200 ₽. Оплата картой,
+          СБП или Telegram Stars.
+        </p>
+      </section>
+    </div>
+  );
+}
 
 function ProfileScreen({
   me,
@@ -327,11 +422,12 @@ function ProfileScreen({
   );
 }
 
-function BuyScreen({ me, onDone }: { me: MeResponse; onDone: () => void }) {
+function BuyScreen({ me, onDone }: { me: MeResponse | null; onDone: () => void }) {
+  const { login } = useAuth();
   const [kind, setKind] = useState<"NEW" | "RENEW">(
-    me.offer.kind === "RENEW" ? "RENEW" : "NEW"
+    me?.offer.kind === "RENEW" ? "RENEW" : "NEW"
   );
-  const [nick, setNick] = useState(me.player?.mcNick ?? "");
+  const [nick, setNick] = useState(me?.player?.mcNick ?? "");
   const [nickError, setNickError] = useState<string | null>(null);
   const [season, setSeason] = useState<PublicSeasonResponse | null>(null);
   const [busy, setBusy] = useState(false);
@@ -344,18 +440,33 @@ function BuyScreen({ me, onDone }: { me: MeResponse; onDone: () => void }) {
   const prices = season?.prices;
   const amount =
     kind === "NEW"
-      ? (prices?.new ?? me.offer.amount)
-      : (prices?.renew ?? me.offer.amount);
+      ? (prices?.new ?? me?.offer.amount ?? 0)
+      : (prices?.renew ?? me?.offer.amount ?? 0);
 
-  const locked = me.offer.kind === "ALREADY_ACTIVE";
-  const noSeason = me.offer.kind === "NO_SEASON";
+  const locked = me?.offer.kind === "ALREADY_ACTIVE";
+  const noSeason = me
+    ? me.offer.kind === "NO_SEASON"
+    : season !== null && season.season === null;
 
   const pay = async (provider: "yookassa" | "stars") => {
     haptic("medium");
     setError(null);
     setBusy(true);
     try {
-      if (kind === "NEW" && !me.player?.mcNick) {
+      // Без входа (браузер) — сначала авторизация по initData Telegram;
+      // если её нет, login() вернёт false → открываем бота.
+      if (!me) {
+        const ok = await login();
+        if (!ok) {
+          openBot("/start");
+          setError(
+            "Оплата и вход работают внутри Telegram — открываю бота. Напиши /start и вернись в мини-апп."
+          );
+          return;
+        }
+      }
+
+      if (kind === "NEW" && !me?.player?.mcNick) {
         if (!NICK_RE.test(nick)) {
           setNickError("Ник: 3–16 символов, латиница, цифры и _.");
           return;
@@ -373,7 +484,7 @@ function BuyScreen({ me, onDone }: { me: MeResponse; onDone: () => void }) {
 
       const res = await createPayment({
         type: kind,
-        mcNick: me.player?.mcNick ? undefined : nick,
+        mcNick: me?.player?.mcNick ? undefined : nick,
       });
       notify("success");
       if (res.confirmationUrl) {
@@ -434,7 +545,7 @@ function BuyScreen({ me, onDone }: { me: MeResponse; onDone: () => void }) {
         <h2 className="ma-block-title">
           <Gamepad2 className="h-4 w-4" /> Minecraft-ник
         </h2>
-        {me.player?.mcNick ? (
+        {me?.player?.mcNick ? (
           <div className="ma-nick-locked">
             {me.player.mcNick} <BadgeCheck className="h-4 w-4" />
           </div>
@@ -634,21 +745,6 @@ function Splash() {
   return (
     <div className="ma-root ma-splash">
       <Loader2 className="h-6 w-6 animate-spin text-[#FF3366]" />
-    </div>
-  );
-}
-
-function OutsideTelegram() {
-  return (
-    <div className="ma-root ma-splash">
-      <div className="ma-gate">
-        <Sparkles className="ma-gate-ic" />
-        <h1>Кабинет Loki Ti</h1>
-        <p>Открой кабинет внутри Telegram — вход произойдёт автоматически.</p>
-        <Button onClick={() => openBot("/start")}>
-          <Gamepad2 className="h-4 w-4" /> Открыть бота
-        </Button>
-      </div>
     </div>
   );
 }
