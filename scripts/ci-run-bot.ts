@@ -20,7 +20,9 @@ const cap = setTimeout(() => {
 
 bot.on("exit", (code, signal) => {
   clearTimeout(cap);
-  process.exit(code ?? (signal ? 1 : 0));
+  // SIGTERM по лимиту — штатное завершение, а не падение (иначе GH красит
+  // каждый перезапуск бота в failure, когда code = null, signal = SIGTERM).
+  process.exit(code ?? 0);
 });
 
 for (const sig of ["SIGINT", "SIGTERM"] as const) {
