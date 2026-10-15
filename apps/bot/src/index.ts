@@ -108,6 +108,14 @@ bot.command("start", async (ctx) => {
 bot.command("help", (ctx) =>
   ctx.reply(texts.help, { parse_mode: "HTML", reply_markup: mainKeyboard })
 );
+// Единый выход из любого диалога: и /cancel в сцене (там он проверяется вручную,
+// конверсии перехватывают апдейты), и глобально, когда сцен активных нет.
+const cancelHandler = async (ctx: BotContext) => {
+  await ctx.conversation.exit().catch(() => undefined);
+  await ctx.reply(texts.cancelled, { reply_markup: mainKeyboard });
+};
+bot.command("cancel", cancelHandler);
+bot.command("menu", startHandler);
 bot.command("me", profileHandler);
 
 bot.command("nick", createConversation(nickConversation, "nick"));
@@ -143,10 +151,7 @@ bot.hears(BTN.buy, (ctx) =>
 bot.hears(BTN.renew, (ctx) => ctx.conversation.enter("renew"));
 bot.hears(BTN.profile, profileHandler);
 bot.hears(BTN.support, (ctx) => ctx.conversation.enter("support"));
-bot.hears(BTN.cancel, async (ctx) => {
-  await ctx.conversation.exit().catch(() => undefined);
-  await ctx.reply("Готово.", { reply_markup: mainKeyboard });
-});
+bot.hears(BTN.cancel, cancelHandler);
 
 // ---------------------------------------------------------- мини-апп
 // Отдельный WebAppInfo вместо ссылки: WebApp-кнопки открывают страницу

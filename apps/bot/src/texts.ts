@@ -1,7 +1,5 @@
 import {
   COPY,
-  DEFAULT_PRICE_NEW_KOPECKS,
-  DEFAULT_PRICE_RENEW_KOPECKS,
   formatKopecks,
   type Offer,
 } from "@loki/shared";
@@ -39,19 +37,17 @@ export const cancelKeyboard = {
 };
 
 export const texts = {
+  cancelled: "✖️ Отменено. Меню ниже 👇",
+
   start(name?: string | null): string {
     const greet = name ? `Привет, <b>${escapeHtml(name)}</b>!` : "Привет!";
     return [
       `👋 ${greet}`,
       "",
-      `Это бот проходки на приватный Minecraft-сервер <b>${COPY.streamerName}</b> (сквад ${COPY.squad}).`,
-      "",
-      `🎮 Сейчас онлайн: смотри на сайте`,
-      `🧾 Первый вход — <b>${formatKopecks(DEFAULT_PRICE_NEW_KOPECKS)}</b>, продление после вайпа — <b>${formatKopecks(DEFAULT_PRICE_RENEW_KOPECKS)}</b>`,
-      "",
-      "📱 <b>Мини-апп</b> — кабинет, покупка и статус сервера прямо в Telegram (кнопка ниже или /app).",
+      `Проходка на приватный Minecraft-сервер <b>${COPY.streamerName}</b> (сквад ${COPY.squad}).`,
       "",
       "Выбери действие ниже 👇",
+      "Все подробности и цены — в сценарии покупки, ничего вводить не нужно.",
     ].join("\n");
   },
 
@@ -63,18 +59,19 @@ export const texts = {
   ].join("\n"),
 
   help: [
-    "📖 <b>Справка</b>",
+    "📖 <b>Команды</b>",
     "",
     "/start — главное меню",
-    "/buy — купить проходку (500 ₽)",
-    "/renew — продление после вайпа (200 ₽)",
-    "/me — профиль, статус и история",
+    "/buy — купить проходку",
+    "/renew — продлить после вайпа",
+    "/me — профиль и история платежей",
     "/nick — привязать или сменить ник",
-    "/support — тикет в поддержку",
+    "/support — вопрос или возврат",
     "/app — мини-апп (кабинет в Telegram)",
+    "/cancel — выйти из любого диалога",
     "/help — эта справка",
     "",
-    "Админам: /admin — панель управления.",
+    "В любой непонятной ситуации — /start.",
   ].join("\n"),
 
   nickPrompt:

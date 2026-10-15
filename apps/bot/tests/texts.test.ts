@@ -74,12 +74,11 @@ describe("escapeHtml", () => {
 });
 
 describe("texts.start / help", () => {
-  it("имя экранируется, цены на месте", () => {
+  it("имя экранируется, без хардкода цен (цены берутся из API)", () => {
     const s = texts.start(`Локи <script>`);
     expect(s).toContain("Локи &lt;script&gt;");
     expect(s).not.toContain("<script>");
-    expect(s).toContain("500 ₽");
-    expect(s).toContain("200 ₽");
+    expect(s).not.toMatch(/\d+\s?₽/);
   });
 
   it("без имени — «Привет!»", () => {
@@ -87,9 +86,13 @@ describe("texts.start / help", () => {
   });
 
   it("help перечисляет все команды", () => {
-    for (const cmd of ["/start", "/buy", "/renew", "/me", "/nick", "/support", "/app", "/help"]) {
+    for (const cmd of ["/start", "/buy", "/renew", "/me", "/nick", "/support", "/app", "/cancel", "/help"]) {
       expect(texts.help).toContain(cmd);
     }
+  });
+
+  it("cancelled — единый текст выхода", () => {
+    expect(texts.cancelled).toContain("Отменено");
   });
 });
 

@@ -55,66 +55,75 @@ export function MiniApp() {
   const authed = status === "ready" && me !== null;
 
   return (
-    <div className="ma-root">
-      <header className="ma-top">
-        <div className="ma-brand">
-          <span className="ma-brand-mark">L</span>
-          <span className="ma-brand-text">LOKI TI · PASS</span>
-        </div>
-        <button
-          type="button"
-          className="ma-refresh"
-          onClick={() => {
-            haptic("light");
-            void refresh();
-          }}
-        >
-          <RefreshCw className="h-3.5 w-3.5" />
-        </button>
-      </header>
+    <div className="ma-page">
+      <div className="ma-phone">
+        <header className="ma-top">
+          <div className="ma-brand">
+            <span className="ma-brand-mark">L</span>
+            <span className="ma-brand-text">LOKI TI · PASS</span>
+          </div>
+          <div className="ma-top-right">
+            {authed && (
+              <button
+                type="button"
+                className="ma-iconbtn"
+                onClick={() => void logout()}
+                aria-label="Выйти"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              type="button"
+              className="ma-iconbtn"
+              onClick={() => {
+                haptic("light");
+                void refresh();
+              }}
+              aria-label="Обновить"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </header>
 
-      <main className="ma-body">
-        {tab === "profile" &&
-          (me ? (
-            <ProfileScreen me={me} onBuy={() => setTab("buy")} />
-          ) : (
-            <ProfileGate
-              apiError={status === "error" ? error : null}
-              onRetry={() => void refresh()}
-              onBuy={() => setTab("buy")}
-            />
-          ))}
-        {tab === "buy" && <BuyScreen me={me} onDone={() => void refresh()} />}
-        {tab === "server" && <ServerScreen />}
-      </main>
+        <main className="ma-body">
+          {tab === "profile" &&
+            (me ? (
+              <ProfileScreen me={me} onBuy={() => setTab("buy")} />
+            ) : (
+              <ProfileGate
+                apiError={status === "error" ? error : null}
+                onRetry={() => void refresh()}
+                onBuy={() => setTab("buy")}
+              />
+            ))}
+          {tab === "buy" && <BuyScreen me={me} onDone={() => void refresh()} />}
+          {tab === "server" && <ServerScreen />}
+        </main>
 
-      <nav className="ma-tabs">
-        <TabButton
-          active={tab === "profile"}
-          onClick={() => setTab("profile")}
-          icon={<UserRound className="h-5 w-5" />}
-          label="Профиль"
-        />
-        <TabButton
-          active={tab === "buy"}
-          onClick={() => setTab("buy")}
-          icon={<Sparkles className="h-5 w-5" />}
-          label="Купить"
-          accent
-        />
-        <TabButton
-          active={tab === "server"}
-          onClick={() => setTab("server")}
-          icon={<Server className="h-5 w-5" />}
-          label="Сервер"
-        />
-      </nav>
-
-      {authed && (
-        <button type="button" className="ma-logout" onClick={() => void logout()}>
-          <LogOut className="h-3.5 w-3.5" /> Выйти
-        </button>
-      )}
+        <nav className="ma-tabs">
+          <TabButton
+            active={tab === "profile"}
+            onClick={() => setTab("profile")}
+            icon={<UserRound className="h-[18px] w-[18px]" />}
+            label="Профиль"
+          />
+          <TabButton
+            active={tab === "buy"}
+            onClick={() => setTab("buy")}
+            icon={<Sparkles className="h-[18px] w-[18px]" />}
+            label="Купить"
+            accent
+          />
+          <TabButton
+            active={tab === "server"}
+            onClick={() => setTab("server")}
+            icon={<Server className="h-[18px] w-[18px]" />}
+            label="Сервер"
+          />
+        </nav>
+      </div>
     </div>
   );
 }
@@ -743,8 +752,10 @@ function Metric({
 
 function Splash() {
   return (
-    <div className="ma-root ma-splash">
-      <Loader2 className="h-6 w-6 animate-spin text-[#FF3366]" />
+    <div className="ma-page">
+      <div className="ma-phone ma-splash">
+        <Loader2 className="h-6 w-6 animate-spin text-[#FF3366]" />
+      </div>
     </div>
   );
 }

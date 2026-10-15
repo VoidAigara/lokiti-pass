@@ -35,17 +35,16 @@ export const TICKET_LIMITS = {
 
 export const RATE_LIMIT_PER_MIN = Number(process.env.RATE_LIMIT_PER_MIN ?? 10);
 
-/** Команды бота для @BotFather. */
+/** Команды бота для @BotFather — короткое и полезное меню (редкие
+ * /nick и /admin работают, но не мусорят в списке команд). */
 export const BOT_COMMANDS = [
-  { command: "start", description: "Главное меню" },
+  { command: "start", description: "Меню" },
   { command: "buy", description: "Купить проходку" },
   { command: "renew", description: "Продлить после вайпа" },
   { command: "me", description: "Мой профиль" },
-  { command: "nick", description: "Привязать / сменить ник" },
-  { command: "support", description: "Написать в поддержку" },
   { command: "app", description: "Мини-апп (кабинет)" },
-  { command: "admin", description: "Панель администратора" },
-  { command: "help", description: "Справка" },
+  { command: "support", description: "Поддержка" },
+  { command: "help", description: "Все команды" },
 ] as const;
 
 export type BotCommand = (typeof BOT_COMMANDS)[number]["command"];

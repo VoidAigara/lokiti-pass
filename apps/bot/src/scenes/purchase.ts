@@ -3,7 +3,7 @@ import type { BotContext } from "../context.js";
 import { formatKopecks } from "@loki/shared";
 import { botEnv } from "../config.js";
 import { callApi, humanApiError } from "../helpers.js";
-import { texts, mainKeyboard } from "../texts.js";
+import { texts, mainKeyboard, BTN } from "../texts.js";
 import { promptNick } from "./nick.js";
 import type { MeResponse, OfferDto, StarsInvoiceResponse } from "../types.js";
 
@@ -25,6 +25,7 @@ function offerButtons(o: OfferDto): { inline_keyboard: ButtonRow[] } {
   } else {
     rows.push([{ text: payLabel, callback_data: "pay:yookassa" }]);
   }
+  rows.push([{ text: BTN.cancel, callback_data: "pay:cancel" }]);
 
   return { inline_keyboard: rows };
 }
@@ -76,15 +77,51 @@ export async function purchaseConversation(
 
   if (offer.kind !== "NEW" && offer.kind !== "RENEW") return;
 
-  // 3) ждём нажатия кнопки оплаты
-  const cb = await conversation.waitForCallbackQuery(/^pay:(yookassa|stars)$/, {
-    otherwise: async (c) => {
-      if (c.callbackQuery) await c.answerCallbackQuery().catch(() => undefined);
-    },
-  });
+  // 3) ждём кнопку оплаты. Раньше здесь висел waitForCallbackQuery, который
+  // МОЛЧА сожирал любые другие апдейты: юзер жал «Отмена»/писал /start —
+  // и бот молчал, конверсия не закрывалась. Теперь цикл: чужие нажатия —
+  // гасим с подсказкой, отмена/меню — честный выход из сценария.
+  let provider: "yookassa" | "stars" | null = null;
+  while (provider === null) {
+    const next = await conversation.waitFor([
+      "callback_query",
+      "message:text",
+    ]);
 
-  const provider = cb.callbackQuery.data.endsWith("stars") ? "stars" : "yookassa";
-  await cb.answerCallbackQuery("Создаю платёж…").catch(() => undefined);
+    if (next.callbackQuery) {
+      const data = next.callbackQuery.data;
+      if (data === "pay:cancel") {
+        await next.answerCallbackQuery("Отменено").catch(() => undefined);
+        await ctx.reply(texts.cancelled, { reply_markup: mainKeyboard });
+        return;
+      }
+      if (data === "pay:yookassa" || data === "pay:stars") {
+        provider = data === "pay:stars" ? "stars" : "yookassa";
+        await next
+          .answerCallbackQuery(
+            provider === "stars" ? "Создаю инвойс Stars…" : "Создаю платёж…"
+          )
+          .catch(() => undefined);
+        break;
+      }
+      await next.answerCallbackQuery().catch(() => undefined);
+      continue;
+    }
+
+    const text = next.message?.text?.trim() ?? "";
+    if (
+      text === BTN.cancel ||
+      text === "/cancel" ||
+      text === "/start" ||
+      text === "/menu"
+    ) {
+      await ctx.reply(texts.cancelled, { reply_markup: mainKeyboard });
+      return;
+    }
+    await ctx.reply(
+      "Нажми кнопку оплаты выше. Если передумал — ✖️ Отмена или /menu."
+    );
+  }
 
   if (provider === "stars") {
     await sendStarsInvoice(ctx, forceType);
